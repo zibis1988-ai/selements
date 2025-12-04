@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>האלמנטים הנחבאים - גלגל המזלות הסיני</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #d4af37; /* Gold */
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            
+            /* Element Colors */
+            --wood: #27ae60;
+            --fire: #c0392b;
+            --earth: #795548;
+            --metal: #95a5a6;
+            --water: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        p.subtitle {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Element Border Colors */
+        .card.wood { border-color: var(--wood); }
+        .card.fire { border-color: var(--fire); }
+        .card.earth { border-color: var(--earth); }
+        .card.metal { border-color: var(--metal); }
+        .card.water { border-color: var(--water); }
+
+        .animal-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .animal-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .season-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            background-color: #eee;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .click-hint {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .main-element-display {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .hidden-elements-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .hidden-elements-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 3px;
+        }
+
+        .hidden-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .hidden-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .hidden-list li:last-child {
+            border-bottom: none;
+        }
+
+        .element-dot {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>סודות הזודיאק הסיני</h1>
+    <p class="subtitle">לחץ על כל חיה כדי לחשוף את האלמנטים הנחבאים (Hidden Stems), העונה השולטת וההרכב האנרגטי שלה.</p>
+
+    <div class="grid-container" id="zodiacGrid">
+        </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">✕</button>
+            <div id="modalBody">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const zodiacData = [
+            { name: "חולדה", icon: "🐀", mainEl: "מים יאנג", season: "חורף (שיא)", type: "water", hidden: ["מים יאנג (100%)"] },
+            { name: "שור", icon: "🐂", mainEl: "אדמה יין", season: "חורף (סוף)", type: "earth", hidden: ["אדמה יין (עיקרי)", "מים יין", "מתכת יין"] },
+            { name: "נמר", icon: "🐅", mainEl: "עץ יאנג", season: "אביב (התחלה)", type: "wood", hidden: ["עץ יאנג (עיקרי)", "אש יאנג", "אדמה יאנג"] },
+            { name: "ארנב", icon: "🐇", mainEl: "עץ יין", season: "אביב (שיא)", type: "wood", hidden: ["עץ יין (100%)"] },
+            { name: "דרקון", icon: "🐉", mainEl: "אדמה יאנג", season: "אביב (סוף)", type: "earth", hidden: ["אדמה יאנג (עיקרי)", "עץ יין", "מים יין"] },
+            { name: "נחש", icon: "🐍", mainEl: "אש יין", season: "קיץ (התחלה)", type: "fire", hidden: ["אש יין (עיקרי)", "מתכת יאנג", "אדמה יאנג"] },
+            { name: "סוס", icon: "🐎", mainEl: "אש יאנג", season: "קיץ (שיא)", type: "fire", hidden: ["אש יאנג (עיקרי)", "אדמה יין"] },
+            { name: "עז", icon: "🐐", mainEl: "אדמה יין", season: "קיץ (סוף)", type: "earth", hidden: ["אדמה יין (עיקרי)", "אש יין", "עץ יין"] },
+            { name: "קוף", icon: "🐒", mainEl: "מתכת יאנג", season: "סתיו (התחלה)", type: "metal", hidden: ["מתכת יאנג (עיקרי)", "מים יאנג", "אדמה יאנג"] },
+            { name: "תרנגול", icon: "🐓", mainEl: "מתכת יין", season: "סתיו (שיא)", type: "metal", hidden: ["מתכת יין (100%)"] },
+            { name: "כלב", icon: "🐕", mainEl: "אדמה יאנג", season: "סתיו (סוף)", type: "earth", hidden: ["אדמה יאנג (עיקרי)", "אש יאנג", "מתכת יין"] },
+            { name: "חזיר", icon: "🐖", mainEl: "מים יין", season: "חורף (התחלה)", type: "water", hidden: ["מים יין (עיקרי)", "עץ יאנג"] }
+        ];
+
+        const grid = document.getElementById('zodiacGrid');
+        const modal = document.getElementById('modalOverlay');
+        const modalBody = document.getElementById('modalBody');
+
+        // Helper to get color based on element text
+        function getElementColor(text) {
+            if (text.includes('עץ')) return 'var(--wood)';
+            if (text.includes('אש')) return 'var(--fire)';
+            if (text.includes('אדמה')) return 'var(--earth)';
+            if (text.includes('מתכת')) return 'var(--metal)';
+            if (text.includes('מים')) return 'var(--water)';
+            return '#333';
+        }
+
+        // Render Cards
+        zodiacData.forEach(animal => {
+            const card = document.createElement('div');
+            card.className = `card ${animal.type}`;
+            card.innerHTML = `
+                <span class="animal-icon">${animal.icon}</span>
+                <div class="animal-name">${animal.name}</div>
+                <div class="season-badge">${animal.season}</div>
+                <div style="font-size:0.9rem; color: ${getElementColor(animal.mainEl)}">
+                    <strong>${animal.mainEl}</strong>
+                </div>
+                <div class="click-hint">לחץ לפרטים נסתרים</div>
+            `;
+            
+            card.onclick = () => openModal(animal);
+            grid.appendChild(card);
+        });
+
+        function openModal(animal) {
+            const hiddenHTML = animal.hidden.map(h => `
+                <li>
+                    <span>${h}</span>
+                    <span class="element-dot" style="background-color: ${getElementColor(h)}"></span>
+                </li>
+            `).join('');
+
+            modalBody.innerHTML = `
+                <span class="animal-icon" style="font-size: 4rem;">${animal.icon}</span>
+                <div class="modal-title">${animal.name}</div>
+                <div class="season-badge">${animal.season}</div>
+                <div class="main-element-display">
+                    אלמנט ראשי: <span style="color:${getElementColor(animal.mainEl)}">${animal.mainEl}</span>
+                </div>
+                
+                <div class="hidden-elements-container">
+                    <div class="hidden-elements-title">האלמנטים הנחבאים (Hidden Stems)</div>
+                    <ul class="hidden-list">
+                        ${hiddenHTML}
+                    </ul>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Close on clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    </script>
+</body>
+</html>
